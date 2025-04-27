@@ -7,7 +7,21 @@ import com.example.serfplayer.data.roomdb.MusicEntity
 import androidx.core.net.toUri
 import kotlin.time.Duration.Companion.milliseconds
 
+/**
+ * Утилитный объект для работы с музыкой, сохранённой на устройстве.
+ */
 object MusicUtil {
+    /**
+     * Загружает список музыкальных файлов с устройства.
+     *
+     * @param context Контекст приложения для доступа к ContentResolver.
+     * @param isTracksSmallerThan100KBSkipped Пропускать ли треки меньше 100 КБ.
+     * @param isTracksShorterThan60SecondsSkipped Пропускать ли треки короче 60 секунд.
+     * @return Список объектов [MusicEntity], представляющих найденные треки.
+     *
+     * При выборке пропускаются треки по заданным фильтрам размера и длительности,
+     * если соответствующие параметры установлены в `true`.
+     */
     fun fetchMusicFromDevice(
         context: Context,
         isTracksSmallerThan100KBSkipped: Boolean = true,
