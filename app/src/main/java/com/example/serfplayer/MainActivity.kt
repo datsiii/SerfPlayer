@@ -1,16 +1,15 @@
 package com.example.serfplayer
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.serfplayer.presentation.music_screen.MusicScreen
+import com.example.serfplayer.presentation.permission.CheckAndRequestPermissions
 import com.example.serfplayer.ui.theme.SerfPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,32 +17,24 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        val listOfPermission = mutableListOf<String>().apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                add(Manifest.permission.READ_MEDIA_AUDIO)
+                add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            else{
+                add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
         setContent {
             SerfPlayerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                CheckAndRequestPermissions(
+                    permissions= listOfPermission
+                ){
+                    MusicScreen(name = "Android", modifier = Modifier.fillMaxSize())
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SerfPlayerTheme {
-        Greeting("Android")
-    }
-}
