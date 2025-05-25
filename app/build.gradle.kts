@@ -87,6 +87,7 @@ dependencies {
     implementation (libs.coil.kt.coil.compose)
     // material3
     implementation (libs.material3)
+    implementation ("androidx.compose.material3:material3:1.2.0")
     implementation (libs.androidx.material3.window.size.class1)
     // Drag and move
     implementation (libs.composereorderable.reorderable)

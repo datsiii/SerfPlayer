@@ -5,16 +5,18 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
-import com.example.serfplayer.presentation.music_screen.MusicScreen
+import androidx.activity.viewModels
+import com.example.serfplayer.navigation.SetupNavigation
+import com.example.serfplayer.presentation.viewmodel.PlayerViewModel
 import com.example.serfplayer.presentation.permission.CheckAndRequestPermissions
 import com.example.serfplayer.ui.theme.SerfPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val playerViewModel: PlayerViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val listOfPermission = mutableListOf<String>().apply {
@@ -31,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 CheckAndRequestPermissions(
                     permissions= listOfPermission
                 ){
-                    MusicScreen(name = "Android", modifier = Modifier.fillMaxSize())
+                    SetupNavigation(playerViewModel)
                 }
             }
         }

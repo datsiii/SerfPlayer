@@ -15,7 +15,6 @@ import kotlinx.parcelize.Parcelize
  * @property albumPath Путь к обложке альбома.
  * @property audioPath Путь к самому аудиофайлу.
  */
-@Parcelize
 @Entity
 data class MusicEntity(
     @PrimaryKey
@@ -25,4 +24,10 @@ data class MusicEntity(
     val duration: Long,
     val albumPath: String,
     val audioPath: String
-) : Parcelable
+) {
+    companion object{
+        val default = MusicEntity(
+            -1, "", "Unknown", 0L, "", ""
+        )
+    }
+}
