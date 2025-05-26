@@ -7,5 +7,6 @@ data class MusicUiState(
     val currentPlayedMusic: MusicEntity = MusicEntity.default,
     val currentDuration: Long = 0L,
     val isPlaying: Boolean = false,
-    val idBottomPlayerShow: Boolean = false
+    val idBottomPlayerShow: Boolean = false,
+    val isPaused: Boolean = false
 )

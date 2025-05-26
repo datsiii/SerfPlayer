@@ -38,6 +38,17 @@ class PlayerViewModel @Inject constructor(
 
             }
         }
+        viewModelScope.launch {
+            enviroment.getCurrentDuration().collect { duration ->
+                updateState { copy(currentDuration = duration) }
+            }
+        }
+
+        viewModelScope.launch {
+            enviroment.isPaused().collect { isPaused ->
+                updateState { copy(isPaused = isPaused) }
+            }
+        }
     }
 
     fun onEvent(event: PlayerEvent) {
@@ -89,6 +100,13 @@ class PlayerViewModel @Inject constructor(
                     enviroment.updateMusicList(event.musicList)
                 }
             }
+
+            PlayerEvent.ResetIsPaused -> {
+                viewModelScope.launch {
+                    enviroment.resetIsPaused()
+                }
+            }
+
         }
     }
 }

@@ -3,21 +3,13 @@ package com.example.serfplayer.presentation.music_player_sheet.component
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,54 +17,29 @@ import androidx.compose.ui.unit.dp
 import com.example.serfplayer.data.roomdb.MusicEntity
 import com.example.serfplayer.presentation.viewmodel.PlayerEvent
 import com.example.serfplayer.presentation.viewmodel.PlayerViewModel
-import com.example.serfplayer.utils.move
-import com.example.serfplayer.utils.swap
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun SheetContent(
     isExpanded: Boolean,
     playerViewModel: PlayerViewModel,
     onBack: () -> Unit
-){
+) {
     val musicUiState by playerViewModel.uiState.collectAsState()
-    val musicList = remember { mutableStateListOf<MusicEntity>() }
-
-    val reorderableState = rememberReorderableLazyListState(
-        onDragEnd = { from, to ->
-            playerViewModel.onEvent(
-                PlayerEvent.UpdateMusicList(musicUiState.musicList
-                    .toMutableList()
-                    .move(from, to))
-            )
-        },
-        onMove = {from, to ->
-            musicList.swap(
-                musicList.move(from.index, to.index)
-            )
-        }
-    )
-
-    LaunchedEffect(musicUiState.musicList) {
-        musicList.swap(musicUiState.musicList)
-    }
 
     BackHandler(isExpanded) {
         onBack()
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxSize()
-                .height(16.dp)//xz
+                .fillMaxWidth()
+                .height(12.dp)  // ручка сверху, можно 12 или 16 dp
         ) {
             Box(
                 modifier = Modifier
@@ -82,32 +49,30 @@ fun SheetContent(
                     .background(color = MaterialTheme.colorScheme.primary)
             )
         }
+
+        Text(
+            text = "Items count: ${musicUiState.musicList.size}",
+            modifier = Modifier.padding(16.dp)
+        )
+
         LazyColumn(
-            state = reorderableState.listState,
-            modifier = Modifier
-                .reorderable(reorderableState)
-                .detectReorderAfterLongPress(reorderableState)
+            modifier = Modifier.fillMaxSize()
         ) {
             items(
                 items = musicUiState.musicList,
-                key = {item: MusicEntity -> item.hashCode()}
-            ){ music ->
-                ReorderableItem(
-                    reorderableState= reorderableState,
-                    key = music.hashCode()
-                ) { isDragging ->
-                    val elevation by animateDpAsState(
-                        targetValue = if(isDragging) 4.dp else 0.dp
-                    )
-                    val currentAudioId = musicUiState.currentPlayedMusic.audioId
-                    SheetMusicItem(
-                        music = music,
-                        selected = isDragging,
-                        elevation = elevation,
-                        onClick = onBack
-                    )
-                }
+                key = { item -> item.audioId } // лучше уникальный и стабильный ключ
+            ) { music ->
+                val elevation by animateDpAsState(
+                    targetValue = if (music.audioId == musicUiState.currentPlayedMusic.audioId) 4.dp else 0.dp
+                )
+                SheetMusicItem(
+                    music = music,
+                    selected = music.audioId == musicUiState.currentPlayedMusic.audioId,
+                    elevation = elevation,
+                    onClick = onBack
+                )
             }
         }
     }
 }
+

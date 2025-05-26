@@ -1,17 +1,20 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.dokka") version "1.8.20"
     id("kotlin-kapt")
     id("kotlin-parcelize")
-    id("com.google.dagger.hilt.android") version "2.44"
+    id("com.google.dagger.hilt.android") version "2.51.1"
 }
+
 
 tasks.dokkaHtml {
     outputDirectory.set(buildDir.resolve("dokka"))
 }
 
+hilt {
+    enableAggregatingTask = false
+}
 
 android {
     namespace = "com.example.serfplayer"
@@ -43,12 +46,30 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.11" // совместимо с Kotlin 1.9.23
+    }
     buildFeatures {
         compose = true
     }
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
+        }
+        resolutionStrategy.eachDependency {
+            if (requested.group == "com.squareup" && requested.name == "javapoet") {
+                useVersion("1.13.0")
+            }
+        }
+
+    }
+
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
+    implementation("com.squareup:javapoet:1.13.0")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -87,10 +108,9 @@ dependencies {
     implementation (libs.coil.kt.coil.compose)
     // material3
     implementation (libs.material3)
-    implementation ("androidx.compose.material3:material3:1.2.0")
     implementation (libs.androidx.material3.window.size.class1)
     // Drag and move
-    implementation (libs.composereorderable.reorderable)
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.0")
     // Motion Layout
     implementation (libs.androidx.constraintlayout.compose)
     // System UI
@@ -103,4 +123,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
 }

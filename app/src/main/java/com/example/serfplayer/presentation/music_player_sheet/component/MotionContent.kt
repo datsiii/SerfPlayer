@@ -40,6 +40,7 @@ import com.example.serfplayer.presentation.viewmodel.PlayerEvent
 fun MotionContent(
     playerViewModel: PlayerViewModel,
     fraction: Float,
+    modifier: Modifier = Modifier
 ){
     val context = LocalContext.current
     val musicUiState by playerViewModel.uiState.collectAsState()
@@ -49,7 +50,7 @@ fun MotionContent(
             .readBytes()
             .decodeToString()
     }
-    Row (modifier = Modifier.fillMaxSize()){
+    Row (modifier = modifier){
         MotionLayout(
             motionScene = MotionScene(content = motionScene),
             progress = fraction,

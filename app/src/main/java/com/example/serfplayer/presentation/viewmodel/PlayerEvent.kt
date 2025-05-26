@@ -12,4 +12,5 @@ sealed interface PlayerEvent {
     object RefreshMusicList: PlayerEvent
     data class SnapTo(val duration: Long): PlayerEvent
     data class UpdateMusicList(val musicList: List<MusicEntity>) : PlayerEvent
+    object ResetIsPaused: PlayerEvent
 }

@@ -1,6 +1,7 @@
 package com.example.serfplayer.presentation.music_player_sheet
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,7 +32,6 @@ fun MusicPlayerSheet(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-
     val motionProgress = sheetState.currentFraction
 
     BackHandler(enabled = sheetState.isVisible) {
@@ -46,19 +46,31 @@ fun MusicPlayerSheet(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     ) {
-        MotionContent(
-            playerViewModel = playerViewModel,
-            fraction = motionProgress,
-        )
-
-        SheetContent(
-            isExpanded = sheetState.currentValue == androidx.compose.material3.SheetValue.Expanded,
-            playerViewModel = playerViewModel,
-            onBack = {
-                scope.launch {
-                    sheetState.hide()
-                }
-            }
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+        ) {
+            MotionContent(
+                playerViewModel = playerViewModel,
+                fraction = motionProgress,
+                modifier = Modifier
+                    .weight(0.4f)  // Задаём 40% высоты для MotionContent (подстрой можно)
+                    .fillMaxWidth()
+            )
+            SheetContent(
+                isExpanded = sheetState.currentValue == androidx.compose.material3.SheetValue.Expanded,
+                playerViewModel = playerViewModel,
+                onBack = {
+                    scope.launch {
+                        sheetState.hide()
+                    }
+                },
+                /*modifier = Modifier
+                    .weight(0.6f)  // Остальные 60% под список
+                    .fillMaxWidth()*/
+            )
+        }
     }
 }
+

@@ -49,7 +49,13 @@ class PlayerEnviroment @Inject constructor(
     private val _isBottomMusicPlayerShowed = MutableStateFlow(false)
     private val isBottomMusicPlayerShowed: StateFlow<Boolean> = _isBottomMusicPlayerShowed
 
+    private val _isPaused = MutableStateFlow(false)
+    private val isPaused: StateFlow<Boolean> = _isPaused
+
     private val playerHandler: Handler = Handler(Looper.getMainLooper())
+
+    private var playingRunnable: Runnable = Runnable { }
+    private var playingHandler: Handler = Handler(Looper.getMainLooper())
 
         private val exoPlayer = ExoPlayer.Builder(context).build().apply {
         addListener(object : Player.Listener {
@@ -118,6 +124,12 @@ class PlayerEnviroment @Inject constructor(
 
     fun getCurrentDuration() : Flow<Long> = currentDuration
 
+    fun isPaused(): Flow<Boolean> = isPaused
+
+    suspend fun resetIsPaused(){
+        _isPaused.emit(false)
+    }
+
     suspend fun play(music: MusicEntity){
         if(music.audioId != MusicEntity.default.audioId){
             _hasStopped.emit(false)
@@ -128,11 +140,18 @@ class PlayerEnviroment @Inject constructor(
                 exoPlayer.prepare()
                 exoPlayer.play()
             }
+
+            playingRunnable = Runnable {
+                val duration = if (exoPlayer.duration != -1L) exoPlayer.currentPosition else 0L
+                _currentDuration.tryEmit(duration)
+            }
+            playingHandler.post(playingRunnable)
         }
     }
 
     suspend fun pause(){
         playerHandler.post{exoPlayer.pause()}
+        _isPaused.emit(true)
     }
 
     suspend fun resume(){
@@ -192,8 +211,8 @@ class PlayerEnviroment @Inject constructor(
         val musicsToInsert = arrayListOf<MusicEntity>()
         val musicsToDelete = arrayListOf<MusicEntity>()
 
-        val storedMusicsIDs = newMusicList.map {it.audioId}
-        val newMusicsIDs  = newMusicList.map { it.audioId }
+        val storedMusicsIDs = allMusics.value.map {it.audioId}
+        val newMusicsIDs  = allMusics.value.map { it.audioId }
 
         newMusicList.forEach {
             if(it.audioId !in storedMusicsIDs) musicsToInsert.add(it)

@@ -26,8 +26,13 @@ fun PlayingProgress(
     onChange: (Float) -> Unit
 ){
     val progress = remember(maxDuration, currentDuration) {
-        currentDuration.toFloat() / maxDuration.toFloat()
+        if (maxDuration > 0) {
+            currentDuration.toFloat() / maxDuration.toFloat()
+        } else {
+            0f
+        }
     }
+
 
     val maxDurationInMinute = remember(maxDuration) {
         maxDuration.milliseconds.inWholeMinutes
@@ -37,11 +42,11 @@ fun PlayingProgress(
         maxDuration.milliseconds.inWholeSeconds % 60
     }
 
-    val currentDurationInMinute = remember(maxDuration) {
+    val currentDurationInMinute = remember(currentDuration) {
         maxDuration.milliseconds.inWholeMinutes
     }
 
-    val currentDurationInSeconds = remember(maxDuration) {
+    val currentDurationInSeconds = remember(currentDuration) {
         maxDuration.milliseconds.inWholeSeconds % 60
     }
 
